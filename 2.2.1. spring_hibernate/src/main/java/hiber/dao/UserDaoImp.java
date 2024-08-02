@@ -1,26 +1,28 @@
 package hiber.dao;
 
-import hiber.model.Car;
 import hiber.model.User;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
 @Repository
 public class UserDaoImp implements UserDao {
+    private final SessionFactory sessionFactory;
 
     @Autowired
-    private SessionFactory sessionFactory;
+    public UserDaoImp(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
     @Override
     public void add(User user) {
-        sessionFactory.getCurrentSession().persist(user);
+        if (user.getCar() != null) {
+            sessionFactory.getCurrentSession().save(user.getCar());
+        }
+        sessionFactory.getCurrentSession().save(user);
     }
 
     @Override
@@ -35,14 +37,16 @@ public class UserDaoImp implements UserDao {
         sessionFactory.getCurrentSession().createQuery("delete from User").executeUpdate();
     }
 
-    public User getUserWhithCar(String model, int series) {
-        String hql = "from User where car.model =: model and car.series =: series ";
+    public List<User> getUserWhithCar(String model, int series) {
+        String hql = "from User where car.model =: model and car.series =: series";
 
-        return (User) sessionFactory.getCurrentSession()
+        return sessionFactory.getCurrentSession()
                 .createQuery(hql)
                 .setParameter("model", model)
                 .setParameter("series", series)
-                .getSingleResult();
+                .getResultList();
+
+
     }
 
 }

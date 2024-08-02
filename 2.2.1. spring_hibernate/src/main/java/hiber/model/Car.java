@@ -3,14 +3,17 @@ package hiber.model;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import java.io.Serializable;
+
 
 @Component
 @Entity
-@Table(name = "cars")
-public class Car {
+@Table(name = "car")
+public class Car implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "model")
@@ -18,10 +21,6 @@ public class Car {
 
     @Column(name = "series")
     private int series;
-
-    @OneToOne
-    @JoinColumn(name = "id")
-    private User user;
 
 
     public Car() {
